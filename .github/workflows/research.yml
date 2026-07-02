@@ -1,0 +1,31 @@
+name: Bomulmoa 리서치 (시세·뉴스 자동수집)
+
+# 고물상 시세 + 뉴스를 정해진 주기마다 자동 수집해 구글 시트에 정리한다.
+on:
+  schedule:
+    - cron: "0 */6 * * *" # 6시간마다 (UTC 기준). 원하면 주기 변경
+  workflow_dispatch: {} # GitHub Actions 탭에서 수동 실행 버튼
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 소스 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 리서치 실행 (시세+뉴스 → 시트)
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} # 선택: 없으면 AI 브리핑만 생략
+        run: npm run research

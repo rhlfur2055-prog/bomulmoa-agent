@@ -1,0 +1,43 @@
+# Slack 앱 매니페스트 — api.slack.com/apps → Create New App → From a manifest 에 붙여넣기
+# (Socket Mode 사용 → 공개 URL 불필요. 슬래시 명령은 ASCII 로 안전하게 등록)
+display_information:
+  name: Bomulmoa
+  description: 고물상 키오스크 팀 업무봇 (매입/단가/작업/현황 + AI)
+  background_color: "#c4703a"
+features:
+  bot_user:
+    display_name: Bomulmoa
+    always_online: true
+  slash_commands:
+    - command: /price
+      description: 단가 조회
+      usage_hint: "[품목]"
+    - command: /buy
+      description: 매입 기록
+      usage_hint: 고객 품목 무게kg
+    - command: /log
+      description: 작업 기록 (하루 목표 1h)
+      usage_hint: 작업내용 시간
+    - command: /today
+      description: 오늘 팀 현황
+    - command: /help
+      description: 명령어 도움말
+oauth_config:
+  scopes:
+    bot:
+      - commands
+      - chat:write
+      - app_mentions:read
+      - im:history
+      - im:read
+      - im:write
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: true
+  socket_mode_enabled: true
+  org_deploy_enabled: false
+  token_rotation_enabled: false

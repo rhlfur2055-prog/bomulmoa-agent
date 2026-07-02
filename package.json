@@ -1,0 +1,31 @@
+{
+  "name": "bomulmoa-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bomulmoa 팀 Slack 에이전트 앱 — 고물상 키오스크 사업 (매입기록/단가/작업로그/AI 자연어)",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "init-sheets": "tsx src/scripts/initSheets.ts",
+    "research": "tsx src/research/run.ts",
+    "research:watch": "tsx src/research/schedule.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.0",
+    "@slack/bolt": "^4.2.0",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
