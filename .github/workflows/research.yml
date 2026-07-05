@@ -2,9 +2,10 @@ name: Bomulmoa 리서치 (시세·뉴스 자동수집)
 
 # 고물상 시세 + 뉴스를 정해진 주기마다 자동 수집해 구글 시트에 정리한다.
 on:
-  schedule:
-    - cron: "0 */6 * * *" # 6시간마다 (UTC 기준). 원하면 주기 변경
-  workflow_dispatch: {} # GitHub Actions 탭에서 수동 실행 버튼
+  # 2026-07-05: 정기 실행은 Vultr 서버(bomulmoa-research.service)로 이관 — 스케줄 비활성화
+  # schedule:
+  #   - cron: "0 */6 * * *"
+  workflow_dispatch: {} # GitHub Actions 탭에서 수동 실행 버튼 (백업용)
 
 jobs:
   research:
