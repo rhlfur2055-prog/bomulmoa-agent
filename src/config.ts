@@ -48,6 +48,11 @@ export const config = {
     apiKey: process.env.ANTHROPIC_API_KEY ?? "",
     model: process.env.ANTHROPIC_MODEL ?? "claude-opus-4-8",
   },
+  gemini: {
+    // 제미나이 키가 있으면 브리핑에 제미나이를 우선 사용
+    apiKey: process.env.GEMINI_API_KEY ?? "",
+    model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+  },
   team: parseTeam(process.env.TEAM_MEMBERS),
   watchIntervalSec: Number(process.env.WATCH_INTERVAL_SEC ?? "60"),
 };

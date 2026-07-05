@@ -27,5 +27,6 @@ jobs:
         env:
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # 선택: 있으면 제미나이로 AI 브리핑
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }} # 선택: 없으면 AI 브리핑만 생략
         run: npm run research

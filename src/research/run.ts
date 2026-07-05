@@ -21,16 +21,16 @@ export async function runResearch(): Promise<void> {
   const addedNews = await saveNews(news);
   console.log(`  · 시트 기록: 시세 ${savedPrices}건, 새 뉴스 ${addedNews}건`);
 
-  if (config.anthropic.apiKey) {
+  if (config.gemini.apiKey || config.anthropic.apiKey) {
     try {
       const brief = await makeBrief(prices, news);
       await saveBrief(brief);
-      console.log("  · Claude 브리핑 저장 완료:\n" + brief);
+      console.log("  · AI 브리핑 저장 완료:\n" + brief);
     } catch (e) {
       console.error("브리핑 생성 실패:", (e as Error).message);
     }
   } else {
-    console.log("  · (ANTHROPIC_API_KEY 없음 → AI 브리핑 건너뜀)");
+    console.log("  · (GEMINI_API_KEY/ANTHROPIC_API_KEY 없음 → AI 브리핑 건너뜀)");
   }
 
   console.log("✅ 리서치 완료");
