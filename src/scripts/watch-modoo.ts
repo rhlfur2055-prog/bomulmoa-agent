@@ -45,7 +45,8 @@ async function main(): Promise<void> {
       const title = (m[1].match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "").replace(/<!\[CDATA\[|\]\]>/g, "");
       const pub = m[1].match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "";
       const ageDays = pub ? (Date.now() - new Date(pub).getTime()) / 86400000 : 999;
-      if (ageDays <= 4 && /2\s*차/.test(title) && /(모집|접수|신청|공고|시작)/.test(title)) {
+      const negative = /(미뤄|미뤄질|연기|지연|보류|무산|불투명|취소)/.test(title);
+      if (ageDays <= 4 && !negative && /2\s*차/.test(title) && /(접수|시작|개시|돌입|공고)/.test(title)) {
         found = true;
         evidence = title;
         break;
