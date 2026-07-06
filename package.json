@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "init-sheets": "tsx src/scripts/initSheets.ts",
     "research": "tsx src/research/run.ts",
-    "research:watch": "tsx src/research/schedule.ts"
+    "research:watch": "tsx src/research/schedule.ts",
+    "crawl-grants": "tsx src/scripts/crawl-grants.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.0",
