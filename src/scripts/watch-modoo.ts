@@ -33,28 +33,53 @@ async function main(): Promise<void> {
     return;
   }
 
-  let html = "";
+  // 1차 소스: 구글 뉴스 RSS (서버에서 검증된 경로 — 공고가 나오면 뉴스가 먼저 뜸)
+  let found = false;
+  let evidence = "";
   try {
-    const res = await fetch(URL, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
-        "Accept-Language": "ko-KR,ko;q=0.9",
-      },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    html = await res.text();
+    const rssUrl =
+      "https://news.google.com/rss/search?q=%22%EB%AA%A8%EB%91%90%EC%9D%98%20%EC%B0%BD%EC%97%85%22%202%EC%B0%A8&hl=ko&gl=KR&ceid=KR:ko";
+    const rss = await (await fetch(rssUrl)).text();
+    const items = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 10);
+    for (const m of items) {
+      const title = (m[1].match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "").replace(/<!\[CDATA\[|\]\]>/g, "");
+      const pub = m[1].match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "";
+      const ageDays = pub ? (Date.now() - new Date(pub).getTime()) / 86400000 : 999;
+      if (ageDays <= 4 && /2\s*차/.test(title) && /(모집|접수|신청|공고|시작)/.test(title)) {
+        found = true;
+        evidence = title;
+        break;
+      }
+    }
     state.failCount = 0;
   } catch (e) {
-    state.failCount += 1;
-    console.log(`[${new Date().toISOString()}] 접속 실패(${state.failCount}회): ${(e as Error).message}`);
-    state.lastCheck = new Date().toISOString();
-    writeFileSync(STATE_FILE, JSON.stringify(state));
-    return;
+    console.log(`[${new Date().toISOString()}] 뉴스 RSS 실패: ${(e as Error).message}`);
   }
 
-  const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ");
-  const found = /2\s*차/.test(text) && /(모집|접수|신청)/.test(text);
-  console.log(`[${new Date().toISOString()}] 확인 완료 — 2차 공고 감지: ${found}`);
+  // 2차 소스: modoo.or.kr 직접 확인 (봇 차단이 있어 실패 허용)
+  if (!found) {
+    try {
+      const res = await fetch(URL, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+          "Accept-Language": "ko-KR,ko;q=0.9",
+        },
+      });
+      if (res.ok) {
+        const text = (await res.text()).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ");
+        if (/2\s*차/.test(text) && /(모집|접수|신청)/.test(text)) {
+          found = true;
+          evidence = "modoo.or.kr 페이지에서 감지";
+        }
+      } else {
+        state.failCount += 1;
+      }
+    } catch {
+      state.failCount += 1;
+    }
+  }
+
+  console.log(`[${new Date().toISOString()}] 확인 완료 — 2차 공고 감지: ${found}${evidence ? ` (${evidence})` : ""}`);
 
   if (found) {
     const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
