@@ -1,6 +1,6 @@
 # Bomulmoa 에이전트 앱 🪙
 
-**고물상 키오스크 스타트업 'Bomulmoa'** 팀(오도경·임동근·임혁진)을 위한 Slack 업무 비서.
+**고물상 키오스크 스타트업 'Bomulmoa'** 팀을 위한 Slack 업무 비서.
 구글 스프레드시트를 백엔드로 쓰며, 매입 기록·단가 조회/수정·팀 작업량 체크·AI 자연어 처리를 지원합니다.
 
 - **스택**: Node.js + TypeScript · [Slack Bolt](https://slack.dev/bolt-js) (Socket Mode) · Google Sheets API · Anthropic Claude
