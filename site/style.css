@@ -255,6 +255,46 @@ body.post-page { padding-bottom: 0; }
 .post-back { margin-top: 24px; font-size: 14px; }
 .post-back a { color: var(--copper-dark); font-weight: 800; text-decoration: none; }
 
+/* ── 지역별 안내 (index) ────────────── */
+#regions { background: var(--card); border-top: 1px solid var(--line); }
+.region-nav { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+.region-link {
+  display: block; text-align: center; text-decoration: none;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 8px; font-size: 16px; font-weight: 800; letter-spacing: -0.4px;
+}
+.region-link:active, .region-link:hover { border-color: var(--copper); background: var(--copper-tint); }
+.region-link small { display: block; font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+
+/* ── 지역 랜딩 페이지 (region/*.html) ── */
+.region-hero { background: var(--dark); }
+.region-hero .container { padding-top: 68px; padding-bottom: 40px; }
+.region-kicker {
+  display: inline-block; background: var(--copper); color: #fff;
+  font-size: 12.5px; font-weight: 800; padding: 4px 12px; border-radius: 999px;
+}
+.region-hero h1 {
+  color: #fff; font-size: 28px; font-weight: 800; letter-spacing: -1px;
+  line-height: 1.35; margin: 14px 0 0; word-break: keep-all;
+}
+.region-lead { color: rgba(255, 255, 255, 0.86); font-size: 15px; margin: 12px 0 22px; word-break: keep-all; }
+.region-hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.region-section { padding: 40px 0; }
+.region-section.region-alt { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.region-section .sec-sub a { color: var(--copper-dark); font-weight: 700; text-decoration: none; }
+.region-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.region-items span {
+  background: var(--copper-tint); color: var(--copper-dark);
+  font-size: 13.5px; font-weight: 700; padding: 6px 13px; border-radius: 999px;
+}
+.region-note { font-size: 13px; color: var(--muted); margin-top: 16px; word-break: keep-all; }
+.region-links-back { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.region-links-back .btn { font-size: 14px; padding: 12px 18px; }
+.loc-card h3 .loc-tag {
+  font-size: 11.5px; font-weight: 700; color: var(--copper-dark);
+  background: var(--copper-tint); padding: 2px 9px; border-radius: 999px; vertical-align: middle;
+}
+
 /* ── 파트너 한 줄 ───────────────────── */
 #partner { padding: 36px 0; }
 .partner-box {

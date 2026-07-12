@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* 계근대 옆 야외/장갑 사용 전제 — 큰 글씨, 높은 대비, 확대 오동작 방지 */
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-family:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
+}
+
+/* iOS에서 input 포커스 시 자동 확대 방지(16px 미만 글꼴이 원인) — 어차피 큰 글씨만 씀 */
+input,
+button,
+select,
+textarea {
+  font-size: 1rem;
+}

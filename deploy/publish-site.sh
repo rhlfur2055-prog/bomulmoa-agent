@@ -49,7 +49,13 @@ for f in index.html style.css data.js prices.js posts.js; do
     echo "⚠️  site/$f 없음 — 건너뜀"
   fi
 done
-for d in posts assets; do
+# 선택 파일 — 아직 없을 수 있으므로 있을 때만 복사 (없어도 경고 없이 통과)
+for f in robots.txt sitemap.xml pickup.html; do
+  if [ -e "site/$f" ]; then
+    cp "site/$f" "$TREASURE_DIR/$f"
+  fi
+done
+for d in posts assets region items; do
   if [ -d "site/$d" ]; then
     mkdir -p "$TREASURE_DIR/$d"
     # 샘플 파일(sample-*)은 실서비스에 싣지 않는다
@@ -59,8 +65,8 @@ for d in posts assets; do
 done
 
 cd "$TREASURE_DIR"
-# 존재하는 배포 경로만 스테이징 (posts.js/posts 는 아직 없을 수 있음)
-for p in index.html style.css data.js prices.js posts.js posts assets; do
+# 존재하는 배포 경로만 스테이징 (posts.js/posts/region 등은 아직 없을 수 있음)
+for p in index.html style.css data.js prices.js posts.js robots.txt sitemap.xml pickup.html posts assets region items; do
   if [ -e "$p" ]; then
     git add "$p"
   fi
