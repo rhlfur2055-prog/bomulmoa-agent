@@ -8,10 +8,11 @@
  * 생성물: site/posts/<slug>.html (정적 포스트 페이지)
  *         site/posts.js          (포스트 목록 매니페스트 — 홈 화면 노출용)
  *         site/posts/index.html  (전체 글 아카이브 페이지)
+ *         site/sitemap.xml       (홈·정기수거·지역·품목·포스트 전체 사이트맵)
  * 같은 날 다시 실행하면 그날 포스트를 제자리에서 갱신합니다 (멱등).
  */
 import "dotenv/config";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { MarketPrice } from "../sheets/research";
 import type { GrantRow } from "../sheets/grants";
@@ -241,6 +242,43 @@ function renderManifest(posts: PostMeta[]): string {
     safeJsonForHtml({ posts }, 2) +
     ";\n"
   );
+}
+
+/* ── 사이트맵 (site/sitemap.xml) ──────────────────── */
+
+const SITEMAP_PATH = join(SITE_DIR, "sitemap.xml");
+
+/** site/<dir>/ 안의 .html 파일명 목록 — 디렉터리가 없으면 빈 목록 */
+function listSiteHtml(dir: string): string[] {
+  try {
+    return readdirSync(join(SITE_DIR, dir))
+      .filter((f) => f.endsWith(".html"))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+/** 홈·정기수거·지역·품목 페이지 + 포스트(샘플 제외)를 담은 sitemap.xml 본문 */
+function renderSitemap(posts: PostMeta[]): string {
+  const lastmod = kstDate();
+  const urls: string[] = [`${BASE_URL}/`];
+  if (existsSync(join(SITE_DIR, "pickup.html"))) urls.push(`${BASE_URL}/pickup.html`);
+  for (const f of listSiteHtml("region")) urls.push(`${BASE_URL}/region/${f}`);
+  for (const f of listSiteHtml("items")) urls.push(`${BASE_URL}/items/${f}`);
+  urls.push(`${BASE_URL}/posts/index.html`);
+  for (const p of posts) {
+    if (!p.slug.startsWith("sample-")) urls.push(`${BASE_URL}/posts/${p.slug}.html`);
+  }
+  const body = urls
+    .map((u) => `  <url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`)
+    .join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+
+function writeSitemap(posts: PostMeta[]): void {
+  writeFileSync(SITEMAP_PATH, renderSitemap(posts));
+  console.log(`${SITEMAP_PATH} 갱신 완료`);
 }
 
 /* ── 포스트 빌더 ─────────────────────────────────── */
@@ -478,6 +516,7 @@ async function main(): Promise<void> {
 
   if (fresh.length === 0 && !removedSample) {
     console.log("생성할 포스트가 없습니다.");
+    if (!dry) writeSitemap(kept); // 새 글이 없어도 사이트맵은 최신 페이지 목록으로 갱신
     return;
   }
   if (removedSample) {
@@ -493,6 +532,8 @@ async function main(): Promise<void> {
     }
     console.log(`--- ${MANIFEST_PATH} ---`);
     console.log(renderManifest(manifest));
+    console.log(`--- ${SITEMAP_PATH} ---`);
+    console.log(renderSitemap(manifest));
     console.log(`(--dry: 파일을 쓰지 않았습니다 — 포스트 ${fresh.length}건, 매니페스트 ${manifest.length}건)`);
     return;
   }
@@ -505,6 +546,7 @@ async function main(): Promise<void> {
   writeFileSync(MANIFEST_PATH, renderManifest(manifest));
   writeFileSync(join(POSTS_DIR, "index.html"), renderArchivePage(manifest));
   console.log(`${MANIFEST_PATH} · ${POSTS_DIR}/index.html 갱신 완료 — 총 ${manifest.length}건`);
+  writeSitemap(manifest);
 }
 
 main().catch((e) => {
