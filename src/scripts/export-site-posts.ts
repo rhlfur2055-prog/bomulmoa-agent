@@ -61,8 +61,25 @@ function won(n: number): string {
   return n > 0 ? `${n.toLocaleString("ko-KR")}원` : "전화 문의";
 }
 
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
+/** KST(Asia/Seoul) 기준 YYYY-MM-DD — 서버 시간대/UTC 와 무관하게 한국 날짜를 쓴다 */
+function kstDate(d = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(d);
+}
+
+/** KST 기준 월요일 여부 (주간 지원사업 포스트 자동 생성 판정용) */
+function isKstMonday(d = new Date()): boolean {
+  return (
+    new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", weekday: "short" }).format(d) ===
+    "Mon"
+  );
+}
+
+/** 인라인 <script> 삽입용 JSON 이스케이프 — </script> 이탈·유니코드 줄구분자 깨짐 방지 */
+function safeJsonForHtml(obj: unknown, space?: number): string {
+  return JSON.stringify(obj, null, space)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 }
 
 /* ── HTML 템플릿 ─────────────────────────────────── */
@@ -80,7 +97,7 @@ function pageShell(opts: {
   main: string;
 }): string {
   const jsonLd = opts.jsonLd
-    ? `<script type="application/ld+json">${JSON.stringify(opts.jsonLd)}</script>\n`
+    ? `<script type="application/ld+json">${safeJsonForHtml(opts.jsonLd)}</script>\n`
     : "";
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -221,7 +238,7 @@ function renderManifest(posts: PostMeta[]): string {
     "// 보물모아 소식·브리핑 목록 — 이 파일은 `npm run export-posts` 로 자동 생성됩니다.\n" +
     "// (수동으로 고쳐도 되지만, 다음 자동 생성 때 덮어써집니다)\n" +
     "window.BOMULMOA_POSTS = " +
-    JSON.stringify({ posts }, null, 2) +
+    safeJsonForHtml({ posts }, 2) +
     ";\n"
   );
 }
@@ -396,7 +413,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const dry = args.includes("--dry");
   const sample = args.includes("--sample");
-  const withGrants = args.includes("--grants") || new Date().getDay() === 1; // 월요일 자동
+  const withGrants = args.includes("--grants") || isKstMonday(); // 월요일(KST) 자동
 
   const fresh: Post[] = [];
 
@@ -421,7 +438,7 @@ async function main(): Promise<void> {
     // 시트 접근이 필요할 때만 동적 로드 (--sample 이 GOOGLE_SHEET_ID 없이도 돌도록)
     const { readMarket, TAB_BRIEF, TAB_NEWS } = await import("../sheets/research");
     const { readRange } = await import("../sheets/client");
-    const date = today();
+    const date = kstDate();
 
     const market = await readMarket();
     if (market.length === 0) {
