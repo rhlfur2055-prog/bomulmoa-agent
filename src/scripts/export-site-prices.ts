@@ -2,13 +2,13 @@
  * export-site-prices.ts — 구글시트 단가표 → site/prices.js 자동 생성 (사이트 단가 반영)
  * 실행: npm run export-prices   (시세/단가 바꾼 뒤 1회 실행 → 사이트 재배포)
  *
- * 단가표에 매입단가가 하나도 없으면 시세조사 탭(서버가 6시간마다 수집하는 시장 시세)으로
- * 자동 폴백한다. 둘 다 비어 있으면 기존 site/prices.js 를 덮어쓰지 않고 그대로 둔다.
+ * 폴백 3단계: 단가표 → 시세조사 탭(서버가 6시간마다 수집하는 시장 시세) →
+ * 실시간 크롤링(gomulprice.com). 구글 인증정보가 없어도(시트 접근 불가) 실시간
+ * 크롤링까지 시도한다. 셋 다 비어 있으면 기존 site/prices.js 를 덮어쓰지 않는다.
  */
 import "dotenv/config";
 import { writeFileSync } from "fs";
-import { getPrices } from "../sheets/prices";
-import { readMarket } from "../sheets/research";
+import { collectPrices } from "../research/prices";
 
 interface SiteItem {
   category: string;
@@ -31,32 +31,70 @@ function nowKST(): string {
   return fmt.format(new Date()).replace(",", "");
 }
 
-/** 단가표 우선, 비어 있으면 시세조사(시장 시세) 폴백. 둘 다 없으면 null */
+/** 단가표 시도 — 구글 인증/환경변수가 없으면 null (동적 import 로 크래시 방지) */
+async function tryPricesSheet(): Promise<SiteItem[] | null> {
+  try {
+    const { getPrices } = await import("../sheets/prices");
+    const prices = await getPrices();
+    if (!prices.some((p) => p.buyPrice > 0)) return null;
+    return prices.map((p) => ({
+      category: p.category || "기타",
+      item: p.item,
+      price: p.buyPrice || null,
+      note: p.note ?? "",
+    }));
+  } catch (e) {
+    console.log("단가표 읽기 불가:", (e as Error).message);
+    return null;
+  }
+}
+
+/** 시세조사 탭 시도 — 마찬가지로 실패 시 null */
+async function tryMarketSheet(): Promise<SiteItem[] | null> {
+  try {
+    const { readMarket } = await import("../sheets/research");
+    const market = (await readMarket()).filter((m) => m.price > 0);
+    if (market.length === 0) return null;
+    return market.map((m) => ({
+      category: m.category || "기타",
+      item: m.item,
+      price: m.price,
+      note: "",
+    }));
+  } catch (e) {
+    console.log("시세조사 읽기 불가:", (e as Error).message);
+    return null;
+  }
+}
+
+/** 실시간 크롤링 시도 (gomulprice.com) — 네트워크 불가 등 실패 시 null */
+async function tryLiveScrape(): Promise<SiteItem[] | null> {
+  try {
+    const scraped = (await collectPrices()).filter((s) => s.price > 0);
+    if (scraped.length === 0) return null;
+    return scraped.map((s) => ({
+      category: s.category || "기타",
+      item: s.item,
+      price: s.price,
+      note: "",
+    }));
+  } catch (e) {
+    console.log("실시간 크롤링 불가:", (e as Error).message);
+    return null;
+  }
+}
+
+/** 단가표 → 시세조사 → 실시간 크롤링 순 폴백. 셋 다 없으면 null */
 async function buildItems(): Promise<{ source: string; items: SiteItem[] } | null> {
-  const prices = await getPrices();
-  if (prices.some((p) => p.buyPrice > 0)) {
-    return {
-      source: "단가표",
-      items: prices.map((p) => ({
-        category: p.category || "기타",
-        item: p.item,
-        price: p.buyPrice || null,
-        note: p.note ?? "",
-      })),
-    };
-  }
-  const market = (await readMarket()).filter((m) => m.price > 0);
-  if (market.length > 0) {
-    return {
-      source: "시세조사 폴백",
-      items: market.map((m) => ({
-        category: m.category || "기타",
-        item: m.item,
-        price: m.price,
-        note: "",
-      })),
-    };
-  }
+  const fromPrices = await tryPricesSheet();
+  if (fromPrices) return { source: "단가표", items: fromPrices };
+
+  const fromMarket = await tryMarketSheet();
+  if (fromMarket) return { source: "시세조사 폴백", items: fromMarket };
+
+  const fromLive = await tryLiveScrape();
+  if (fromLive) return { source: "실시간 크롤링(gomulprice)", items: fromLive };
+
   return null;
 }
 
@@ -64,7 +102,7 @@ async function main(): Promise<void> {
   const built = await buildItems();
   if (!built) {
     console.log(
-      "단가표·시세조사 모두 유효한 시세가 없음 — 기존 site/prices.js 를 유지합니다 (덮어쓰기 안 함)."
+      "단가표·시세조사·실시간 크롤링 모두 유효한 시세가 없음 — 기존 site/prices.js 를 유지합니다 (덮어쓰기 안 함)."
     );
     return;
   }
