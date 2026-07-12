@@ -20,6 +20,9 @@ features:
       usage_hint: 작업내용 시간
     - command: /today
       description: 오늘 팀 현황
+    - command: /grants
+      description: 창업·중소기업 지원사업 공고 조회
+      usage_hint: "[검색어]"
     - command: /help
       description: 명령어 도움말
 oauth_config:

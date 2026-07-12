@@ -1,0 +1,11 @@
+# 보물모아 서버 cron 참고본 — 실제 설치는 `bash deploy/setup-cron.sh` 권장(경로 자동 처리).
+# 수동 설치 시 REPO_DIR 를 실제 경로로 바꾸고 `crontab -e` 에 붙여넣으세요.
+CRON_TZ=Asia/Seoul
+# 지원사업 통합 크롤러 — 매일 08:00
+0 8 * * * cd REPO_DIR && npx tsx src/scripts/crawl-grants.ts >> /var/log/bomulmoa/crawl-grants.log 2>&1
+# 예비창업 공고 감시망 — 매일 09:00
+0 9 * * * cd REPO_DIR && npx tsx src/scripts/watch-grants.ts >> /var/log/bomulmoa/watch-grants.log 2>&1
+# 「모두의 창업」 2차 공고 감시 — 2시간마다
+0 */2 * * * cd REPO_DIR && npx tsx src/scripts/watch-modoo.ts >> /var/log/bomulmoa/watch-modoo.log 2>&1
+# 시세·뉴스 리서치 — 6시간마다
+0 */6 * * * cd REPO_DIR && npm run research >> /var/log/bomulmoa/research.log 2>&1

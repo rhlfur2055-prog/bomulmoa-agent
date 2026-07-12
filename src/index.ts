@@ -4,6 +4,7 @@ import { runAgent } from "./agent/agent";
 import { getPrices } from "./sheets/prices";
 import { addIntake, getTodayIntake } from "./sheets/intake";
 import { logWork, getDaySummary } from "./sheets/worklog";
+import { getGrants, ensureGrantsTab } from "./sheets/grants";
 import { won } from "./format";
 import { startPriceWatcher } from "./watcher";
 import { ensureAllTabs } from "./scripts/initSheets";
@@ -62,6 +63,46 @@ async function doToday(): Promise<string> {
   return `📊 *오늘 현황*\n\n*팀 작업량* (목표 1h)\n${workLines}\n\n*매입*\n• ${intake.count}건 · 총 ${won(intake.total)}`;
 }
 
+/** 지원사업 조회 — 진행중(마감 안 지난) 공고를 마감 임박순으로 */
+async function doGrants(text: string): Promise<string> {
+  await ensureGrantsTab(); // 최초 조회 시 탭이 없어도 안전
+  const rows = await getGrants();
+  const q = text.trim();
+  const filtered = q
+    ? rows.filter((g) => `${g.title} ${g.org} ${g.field} ${g.region} ${g.target}`.includes(q))
+    : rows;
+  if (!filtered.length) {
+    return q
+      ? `'${q}' 관련 지원사업을 찾지 못했어요. (서버에서 \`npm run crawl-grants\` 로 수집)`
+      : "아직 수집된 지원사업이 없어요. 서버에서 `npm run crawl-grants` 실행 후 다시 시도하세요.";
+  }
+  const dleft = (end: string): number | null => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(end)) return null;
+    return Math.floor((new Date(end + "T23:59:59+09:00").getTime() - Date.now()) / 86400000);
+  };
+  const open = filtered.filter((g) => {
+    const d = dleft(g.endDate);
+    return d === null || d >= 0; // 진행중 또는 마감일 미상
+  });
+  open.sort((a, b) => {
+    const da = dleft(a.endDate);
+    const db = dleft(b.endDate);
+    if (da === null) return 1;
+    if (db === null) return -1;
+    return da - db;
+  });
+  const shown = open.slice(0, 15);
+  const lines = shown.map((g) => {
+    const d = dleft(g.endDate);
+    const dd = d === null ? "" : d === 0 ? " *오늘마감*" : d > 0 ? ` D-${d}` : " ~마감";
+    const meta = [g.org, g.field, g.region].filter(Boolean).join(" · ");
+    const head = g.link ? `<${g.link}|${g.title}>` : g.title;
+    return `• ${head}${dd}${meta ? ` _(${meta})_` : ""}`;
+  });
+  const more = open.length > shown.length ? `\n_…외 ${open.length - shown.length}건 (검색어로 좁혀보세요)_` : "";
+  return `📋 *지원사업 공고* (진행중 ${open.length}건${q ? ` · 검색: ${q}` : ""})\n${lines.join("\n")}${more}`;
+}
+
 /** 도움말 */
 async function doHelp(): Promise<string> {
   return [
@@ -70,6 +111,7 @@ async function doHelp(): Promise<string> {
     "• `/buy` (`/매입`) 고객 품목 무게 — 매입 기록",
     "• `/log` (`/작업`) 내용 시간 — 작업 기록 (목표 1h)",
     "• `/today` (`/오늘`) — 오늘 팀 현황",
+    "• `/grants` (`/지원사업`) [검색어] — 창업·중소기업 지원사업 공고 조회",
     "• 또는 저를 *멘션/DM* 해서 한국어로 자유롭게: \"구리 시세 검색해줘\", \"임동근 조사 1시간\"",
   ].join("\n");
 }
@@ -92,6 +134,7 @@ register(["/price", "/단가"], (t) => doPrice(t));
 register(["/buy", "/매입"], (t, uid) => doBuy(t, uid));
 register(["/log", "/작업"], (t, uid, uname) => doLog(t, uid, uname));
 register(["/today", "/오늘"], () => doToday());
+register(["/grants", "/지원사업"], (t) => doGrants(t));
 register(["/help", "/도움"], () => doHelp());
 
 // ── @멘션 & DM : AI 자연어 에이전트 (웹검색·시트·메모리) ────
