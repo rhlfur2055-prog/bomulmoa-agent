@@ -31,8 +31,11 @@ const db = new PGlite();
 // ---------- (a) Supabase auth 스텁 ----------
 // - auth.users: FK 대상 테이블 스텁
 // - auth.uid()/auth.jwt(): GUC(app.uid / app.jwt) 를 읽는 스텁
-// - authenticated 롤: Supabase 에는 기본 존재하므로 여기서 미리 생성
-//   (0002 의 정책들이 `to authenticated` 로 참조 → 마이그레이션 전에 필요)
+// - authenticated/anon 롤: Supabase 에는 기본 존재하므로 여기서 미리 생성
+//   (0002 가 `to authenticated` 정책과 `revoke ... from anon` 으로 참조)
+// - default privileges: Supabase 는 새 테이블에 anon/authenticated 권한을
+//   자동 부여한다. 이를 흉내내야 0002 의 명시 revoke 가 실제로 anon 권한을
+//   걷어내는지 검증할 수 있다.
 await db.exec(`
   create schema auth;
 
@@ -47,6 +50,10 @@ await db.exec(`
   as $$ select coalesce(nullif(current_setting('app.jwt', true), ''), '{}')::jsonb $$;
 
   create role authenticated nologin;
+  create role anon nologin;
+  grant usage on schema public to anon, authenticated;
+
+  alter default privileges in schema public grant all on tables to anon, authenticated;
 `);
 
 // ---------- (b) 마이그레이션 + seed 실행 ----------
@@ -169,6 +176,44 @@ await actAs(ADMIN_UID, "admin");
   const res = await db.query(`update item_prices set price_krw = price_krw + 0`);
   check("관리자: item_prices update 허용 (16행)", res.affectedRows === 16, `${res.affectedRows}행 갱신됨`);
 }
+
+// 7) 관리자: 매입 memo 정정 허용 — update 정책의 WITH CHECK 가 정상 통과하는지
+{
+  const res = await db.query(`update purchases set memo = '정정 테스트'`);
+  check("관리자: 매입 memo 정정 허용 (2행)", res.affectedRows === 2, `${res.affectedRows}행 갱신됨`);
+}
+
+// 8) 관리자라도 created_by 바꿔치기는 불변 트리거가 차단해야 함 (감사 추적)
+try {
+  await db.query(`update purchases set created_by = $1`, [ADMIN_UID]);
+  check("감사 추적: purchases.created_by 변경 차단 (트리거)", false, "update 가 성공해버림");
+} catch {
+  check("감사 추적: purchases.created_by 변경 차단 (트리거)", true);
+}
+
+// 9) 형식 오류 yard_id 클레임 → 캐스트 에러 없이 0건 (fail-closed)
+await actAs(STAFF_UID, "staff", "not-a-uuid");
+try {
+  const rows = (await db.query(`select id from purchases`)).rows;
+  check(
+    "직원: 형식 오류 yard_id 클레임 → 에러 없이 0건 (fail-closed)",
+    rows.length === 0,
+    `${rows.length}건 조회됨`
+  );
+} catch (e) {
+  check("직원: 형식 오류 yard_id 클레임 → 에러 없이 0건 (fail-closed)", false, e.message);
+}
+
+// 10) anon 롤: 0002 의 명시 revoke 로 테이블 접근 자체가 거부되어야 함
+//     (revoke 가 없으면 스텁의 default privileges 때문에 select 가 성공한다)
+await db.exec(`set role anon`);
+try {
+  await db.query(`select * from sellers`);
+  check("anon: sellers 접근 차단 (명시 revoke)", false, "select 가 성공해버림");
+} catch {
+  check("anon: sellers 접근 차단 (명시 revoke)", true);
+}
+await db.exec(`reset role; set role authenticated`);
 
 // ---------- 결과 ----------
 console.log(failed === 0 ? "\n모든 테스트 통과" : `\n실패 ${failed}건`);

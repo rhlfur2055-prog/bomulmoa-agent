@@ -64,8 +64,10 @@ supabase db push                       # 0001_schema.sql → 0002_rls.sql 순서
 # 방법 A: psql 직접 (연결 문자열은 대시보드 → Settings → Database)
 psql "$SUPABASE_DB_URL" -f supabase/seed.sql
 
-# 방법 B: supabase CLI
-supabase db execute --file supabase/seed.sql
+# 방법 B: supabase CLI — 2단계의 push 시점에 seed 를 함께 적용
+#   (supabase init 기본 config 의 seed 경로가 supabase/seed.sql 이라 그대로 인식된다.
+#    이미 push 를 끝냈다면 방법 A 를 사용할 것.)
+supabase db push --include-seed
 ```
 
 > ⚠️ `seed.sql` 의 단가는 **예시 단가**다. 실전 투입 전 관리자 화면(Phase 3) 또는 SQL 로 실단가 수정 필수. 또한 단순 insert 라 **신규 DB에 1회만** 적용할 것.
@@ -111,7 +113,7 @@ npm install
 npm run verify:sql
 ```
 
-검증 항목: seed 건수(yards 3 / items 16 / item_prices 16), 직원의 소속 업장 매입 기록 허용·타 업장 차단·조회 필터링, 직원의 단가 수정 차단, 관리자의 전체 조회·단가 수정 허용.
+검증 항목: seed 건수(yards 3 / items 16 / item_prices 16), 직원의 소속 업장 매입 기록 허용·타 업장 차단·조회 필터링, 직원의 단가 수정 차단, 관리자의 전체 조회·단가 수정·memo 정정 허용, `created_by` 불변 트리거(감사 추적), 형식 오류 `yard_id` 클레임 fail-closed, anon 롤 테이블 접근 차단(명시 revoke).
 
 ---
 
