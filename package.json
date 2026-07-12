@@ -12,7 +12,8 @@
     "research": "tsx src/research/run.ts",
     "research:watch": "tsx src/research/schedule.ts",
     "crawl-grants": "tsx src/scripts/crawl-grants.ts",
-    "export-prices": "tsx src/scripts/export-site-prices.ts"
+    "export-prices": "tsx src/scripts/export-site-prices.ts",
+    "export-posts": "tsx src/scripts/export-site-posts.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.0",

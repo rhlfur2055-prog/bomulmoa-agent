@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="data.js"></script>
 <script src="prices.js"></script>
+<script src="posts.js"></script>
 </head>
 <body>
 
@@ -65,6 +66,18 @@
       <tbody id="price-body"></tbody>
     </table>
     <p class="price-note">※ 표에 없는 품목도 매입합니다. 사진과 함께 문의 주시면 바로 확인해 드립니다.</p>
+  </div>
+</section>
+
+<!-- ②-b 소식·시세 브리핑 (posts.js 매니페스트가 비어 있으면 통째로 숨김) -->
+<section id="posts" class="hidden">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">📰 소식·시세 브리핑</h2>
+      <p class="sec-sub">고철·비철 시세와 지원사업 소식을 정리해 올립니다</p>
+    </div>
+    <div class="post-list" id="post-list"></div>
+    <a class="post-more" href="posts/index.html">전체 보기 →</a>
   </div>
 </section>
 
@@ -307,6 +320,21 @@
   document.getElementById("price-filter").addEventListener("input", function () {
     renderPrices(this.value);
   });
+
+  /* ── 소식·시세 브리핑 (매니페스트 없거나 비면 섹션 숨김 유지) ── */
+  var postsWrap = window.BOMULMOA_POSTS || {};
+  var posts = postsWrap.posts || [];
+  var postTypeLabel = { sise: "시세 브리핑", grants: "지원사업" };
+  if (posts.length) {
+    document.getElementById("post-list").innerHTML = posts.slice(0, 5).map(function (p) {
+      return '<a class="post-item" href="posts/' + esc(p.slug) + '.html">' +
+        '<span class="post-item-meta">' + esc(p.date) + " · " + esc(postTypeLabel[p.type] || p.type || "") + "</span>" +
+        '<span class="post-item-title">' + esc(p.title) + "</span>" +
+        (p.summary ? '<span class="post-item-summary">' + esc(p.summary) + "</span>" : "") +
+        "</a>";
+    }).join("");
+    document.getElementById("posts").classList.remove("hidden");
+  }
 
   /* ── 거점 카드 ── */
   document.getElementById("loc-grid").innerHTML = locations.map(function (l) {

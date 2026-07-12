@@ -30,6 +30,8 @@ CRON_TZ=Asia/Seoul
 0 */2 * * * cd $REPO_DIR && $NPX tsx src/scripts/watch-modoo.ts >> $LOG_DIR/watch-modoo.log 2>&1
 # 시세·뉴스 리서치 — 6시간마다
 0 */6 * * * cd $REPO_DIR && $NPM run research >> $LOG_DIR/research.log 2>&1
+# 사이트 자동 발행 — 매일 08:40 (시세·소식 생성 → Treasure-Collective 푸시 → Cloudflare 자동배포)
+40 8 * * * cd $REPO_DIR && bash deploy/publish-site.sh >> $LOG_DIR/publish-site.log 2>&1
 # <<< bomulmoa-cron <<<
 EOF
 

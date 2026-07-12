@@ -48,3 +48,7 @@
    (Treasure-Collective 워커에 `/api/prices` 가 있다면, 추후 prices.js 대신 그 API를 읽도록 개선 가능)
 
 > Claude 세션에서 자동 이식하려면 세션의 GitHub 접근 범위에 `Treasure-Collective` 레포를 추가해야 한다.
+
+### 자동 발행 (cron)
+
+서버 cron이 매일 08:40(KST)에 `deploy/publish-site.sh` 를 실행한다 — 시세(`prices.js`)·소식(`posts.js`)을 재생성한 뒤, `TREASURE_DIR`(기본 `$HOME/Treasure-Collective`)에 push 가능한 clone이 있으면 배포 파일을 복사·커밋·푸시까지 자동으로 처리한다 (main 푸시 → Cloudflare Workers 자동배포). clone 이 없으면 파일만 로컬에 생성되므로 위 이식 절차를 수동으로 진행하면 된다. 상세 조건은 [CICD.md](../CICD.md) 참고.
