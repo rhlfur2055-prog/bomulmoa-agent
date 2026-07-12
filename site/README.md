@@ -33,3 +33,18 @@
 3개 지점 모두 [네이버 스마트플레이스](https://smartplace.naver.com)에 등록하고,
 발급된 플레이스 링크를 `data.js` 의 `naverPlaceUrl` 에 붙여넣으세요.
 지점 카드에 [네이버 지도] 버튼이 자동으로 생깁니다.
+
+---
+
+## 🚀 bomulmoa.com 실서비스 반영 (Treasure-Collective 이식)
+
+라이브 bomulmoa.com 은 이 레포가 아니라 **`rhlfur2055-prog/Treasure-Collective` 레포에서 Cloudflare Workers로 배포**된다 (main 푸시 → GitHub Actions 자동배포). 이 폴더의 새 사이트를 반영하려면:
+
+1. Treasure-Collective 레포에 이 폴더의 파일 복사:
+   `index.html`, `style.css`, `data.js`, `prices.js` (+ 재사용하는 `assets/hero.mp4`, `assets/hero-poster.jpg`)
+2. `data.js` 의 ★ 항목(실전화·실주소·좌표·네이버플레이스) 입력 — 거점: 대림자원(부평)·모두다자원(인천)·대성자원(부천)
+3. main 에 푸시 → 자동배포. 단, **GitHub Secrets 에 `CLOUDFLARE_API_TOKEN` 등록이 완료됐는지 먼저 확인** (7/5 기준 미등록 상태였음)
+4. 단가 갱신 루틴: 이 레포에서 `npm run export-prices` 로 생성한 `prices.js` 를 Treasure-Collective 에 복사·푸시
+   (Treasure-Collective 워커에 `/api/prices` 가 있다면, 추후 prices.js 대신 그 API를 읽도록 개선 가능)
+
+> Claude 세션에서 자동 이식하려면 세션의 GitHub 접근 범위에 `Treasure-Collective` 레포를 추가해야 한다.
