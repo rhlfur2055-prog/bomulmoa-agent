@@ -5,6 +5,7 @@ import { getPrices } from "./sheets/prices";
 import { addIntake, getTodayIntake } from "./sheets/intake";
 import { logWork, getDaySummary } from "./sheets/worklog";
 import { getGrants, ensureGrantsTab } from "./sheets/grants";
+import { readMarket, ensureResearchTabs, type MarketPrice } from "./sheets/research";
 import { won } from "./format";
 import { startPriceWatcher } from "./watcher";
 import { ensureAllTabs } from "./scripts/initSheets";
@@ -103,6 +104,34 @@ async function doGrants(text: string): Promise<string> {
   return `📋 *지원사업 공고* (진행중 ${open.length}건${q ? ` · 검색: ${q}` : ""})\n${lines.join("\n")}${more}`;
 }
 
+/** 고물상 실제 시장 시세 조회 — 시세조사 탭의 품목별 최신 스냅샷 */
+async function doMarket(text: string): Promise<string> {
+  await ensureResearchTabs(); // 최초 조회 시 탭이 없어도 안전
+  const rows = await readMarket();
+  const q = text.trim();
+  const list = q ? rows.filter((m) => m.item.includes(q) || m.category.includes(q)) : rows;
+  if (!list.length) {
+    return rows.length === 0
+      ? "아직 수집된 시세가 없어요. 서버에서 `npm run research` 를 실행하면 채워집니다.\n지금 바로 알고 싶으면 저를 *멘션*해서 “구리 시세 검색해줘”라고 하면 실시간으로 찾아드려요."
+      : `‘${q}’ 시세를 찾지 못했어요. 저를 *멘션*해서 실시간 검색을 요청해보세요. (예: “${q} 시세 검색해줘”)`;
+  }
+  const asof = list.map((m) => m.collectedAt).filter(Boolean).sort().slice(-1)[0] ?? "";
+  const byCat = new Map<string, MarketPrice[]>();
+  for (const m of list) {
+    const k = m.category || "기타";
+    const arr = byCat.get(k) ?? [];
+    arr.push(m);
+    byCat.set(k, arr);
+  }
+  const blocks: string[] = [];
+  for (const [cat, items] of byCat) {
+    items.sort((a, b) => b.price - a.price);
+    blocks.push(`*${cat}*\n` + items.map((m) => `• ${m.item} — *${won(m.price)}*/kg`).join("\n"));
+  }
+  const sources = [...new Set(list.map((m) => m.source).filter(Boolean))].join(", ");
+  return `📈 *고물상 실제 시세*${asof ? ` (${asof} 수집)` : ""}${q ? ` · 검색: ${q}` : ""}\n${blocks.join("\n\n")}${sources ? `\n\n_출처: ${sources} · 우리 매입가는 \`/단가\` 참고_` : ""}`;
+}
+
 /** 도움말 */
 async function doHelp(): Promise<string> {
   return [
@@ -112,6 +141,7 @@ async function doHelp(): Promise<string> {
     "• `/log` (`/작업`) 내용 시간 — 작업 기록 (목표 1h)",
     "• `/today` (`/오늘`) — 오늘 팀 현황",
     "• `/grants` (`/지원사업`) [검색어] — 창업·중소기업 지원사업 공고 조회",
+    "• `/market` (`/시세`) [품목] — 고물상 실제 시장 시세 (수집된 최신값)",
     "• 또는 저를 *멘션/DM* 해서 한국어로 자유롭게: \"구리 시세 검색해줘\", \"임동근 조사 1시간\"",
   ].join("\n");
 }
@@ -135,6 +165,7 @@ register(["/buy", "/매입"], (t, uid) => doBuy(t, uid));
 register(["/log", "/작업"], (t, uid, uname) => doLog(t, uid, uname));
 register(["/today", "/오늘"], () => doToday());
 register(["/grants", "/지원사업"], (t) => doGrants(t));
+register(["/market", "/시세"], (t) => doMarket(t));
 register(["/help", "/도움"], () => doHelp());
 
 // ── @멘션 & DM : AI 자연어 에이전트 (웹검색·시트·메모리) ────

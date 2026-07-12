@@ -23,6 +23,9 @@ features:
     - command: /grants
       description: 창업·중소기업 지원사업 공고 조회
       usage_hint: "[검색어]"
+    - command: /market
+      description: 고물상 실제 시장 시세 조회
+      usage_hint: "[품목]"
     - command: /help
       description: 명령어 도움말
 oauth_config:
