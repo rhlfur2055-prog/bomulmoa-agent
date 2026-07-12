@@ -46,3 +46,35 @@ export async function saveBrief(text: string): Promise<void> {
   const now = new Date().toISOString().slice(0, 16).replace("T", " ");
   await appendRow(TAB_BRIEF, [now, text]);
 }
+
+/** 시세조사 탭에서 읽어온 시장 시세 한 건 */
+export interface MarketPrice {
+  collectedAt: string; // 수집일시
+  category: string; // 구분 (비철/고철 등)
+  item: string; // 품목
+  price: number; // 원/kg
+  source: string; // 출처
+}
+
+/**
+ * 시세조사 탭을 읽어 품목별 '최신' 스냅샷만 반환한다.
+ * (탭은 매 수집마다 이력으로 쌓이므로 품목별로 수집일시가 가장 최근인 행만 남긴다.)
+ */
+export async function readMarket(): Promise<MarketPrice[]> {
+  const rows = await readRange(`${TAB_MARKET}!A2:E`);
+  const latest = new Map<string, MarketPrice>();
+  for (const r of rows) {
+    const item = (r[2] ?? "").trim();
+    if (!item) continue;
+    const rec: MarketPrice = {
+      collectedAt: r[0] ?? "",
+      category: (r[1] ?? "").trim(),
+      item,
+      price: Number(String(r[3] ?? "0").replace(/[^0-9.-]/g, "")) || 0,
+      source: (r[4] ?? "").trim(),
+    };
+    const prev = latest.get(item);
+    if (!prev || rec.collectedAt >= prev.collectedAt) latest.set(item, rec);
+  }
+  return [...latest.values()];
+}

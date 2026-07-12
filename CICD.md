@@ -67,3 +67,29 @@ npm run research:watch    # 로컬에서 6시간마다 (PC 켜둬야 함)
 | `시세조사` | 품목별 매입시세(원/kg) 이력 | gomulprice.com |
 | `뉴스` | 고물상/고철/재활용 뉴스 (중복 제거) | Google News RSS |
 | `리서치브리핑` | 시장흐름·매입가 조정 제안·주요뉴스 요약 | Claude (선택) |
+
+---
+
+## 🖥️ 서버 자동 실행 (cron)
+
+정기 실행은 Vultr 서버에서 cron으로 돈다. repo 루트에 `.env`(SLACK_*, GOOGLE_*, 선택 `BIZINFO_API_KEY`/`DATA_GO_KR_KEY`)를 두고 한 번만 설치하면 된다:
+
+```bash
+git pull                     # 최신 코드
+npm install                  # 의존성
+bash deploy/setup-cron.sh    # cron 설치 (idempotent — 여러 번 실행해도 안전)
+```
+
+설치되는 작업(시간은 KST):
+
+| 스크립트 | 주기 | 하는 일 |
+|---|---|---|
+| `crawl-grants.ts` | 매일 08:00 | 기업마당·K-Startup·구글뉴스에서 지원사업 수집 → `지원사업` 시트 + 마감임박 Slack |
+| `watch-grants.ts` | 매일 09:00 | 예비창업 신규 공고 감시 알림 |
+| `watch-modoo.ts` | 2시간마다 | 「모두의 창업」 2차 공고 감시 |
+| `npm run research` | 6시간마다 | 시세·뉴스 리서치 |
+| `deploy/publish-site.sh` | 매일 08:40 | 시세·소식 글 생성 → `TREASURE_DIR` 설정 시 Treasure-Collective 푸시 → Cloudflare 자동배포 |
+
+사이트 완전 자동 발행이 되려면 세 가지가 갖춰져야 한다: ① 서버에 **push 권한 있는 Treasure-Collective clone**이 있어야 하고, ② 그 경로를 `TREASURE_DIR` 환경변수(기본 `$HOME/Treasure-Collective`)로 지정해야 하며, ③ Treasure-Collective 레포의 GitHub Secrets 에 `CLOUDFLARE_API_TOKEN` 이 등록돼 있어야 main 푸시 시 Cloudflare Workers 자동배포가 완료된다. 셋 중 하나라도 없으면 `publish-site.sh` 는 사이트 파일만 로컬에 생성하고 안내 메시지를 남긴다.
+
+로그는 `/var/log/bomulmoa/*.log`. Slack에서 `/지원사업` 으로 수집분을 언제든 조회할 수 있다.

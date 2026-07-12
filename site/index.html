@@ -3,181 +3,380 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>보물모아 — 고철, 제값 받고 파는 가장 쉬운 방법</title>
-<meta name="description" content="동네 고물상 네트워크와 오늘의 고철·구리·알루미늄 시세를 한 곳에서. 정확한 계량, 투명한 정산.">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-    background: #f6f5f2;
-    color: #2c2c2a;
-    line-height: 1.6;
-  }
-  .wrap { max-width: 520px; margin: 0 auto; background: #fff; min-height: 100vh; }
-
-  header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 20px;
-    position: sticky; top: 0; background: rgba(255,255,255,.92);
-    backdrop-filter: blur(8px); z-index: 10;
-    border-bottom: 1px solid #eee;
-  }
-  header .logo { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; }
-  header nav a {
-    font-size: 13px; color: #666; text-decoration: none; margin-left: 14px;
-  }
-
-  .hero { position: relative; overflow: hidden; }
-  .hero video { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-  .hero .overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(20,18,14,.78) 0%, rgba(20,18,14,.15) 45%, rgba(20,18,14,0) 70%);
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 24px 22px 30px;
-  }
-  .hero h1 {
-    color: #fff; font-size: 26px; font-weight: 800; letter-spacing: -0.8px;
-    line-height: 1.35; text-shadow: 0 1px 8px rgba(0,0,0,.4);
-  }
-  .hero p { color: rgba(255,255,255,.85); font-size: 14px; margin: 8px 0 18px; }
-  .hero .cta {
-    display: inline-block; align-self: flex-start;
-    background: #fff; color: #2c2c2a; font-size: 15px; font-weight: 700;
-    padding: 12px 26px; border-radius: 10px; text-decoration: none;
-  }
-
-  section { padding: 34px 22px; }
-  .sec-title { font-size: 20px; font-weight: 800; letter-spacing: -0.6px; margin-bottom: 4px; }
-  .sec-sub { font-size: 13px; color: #888; margin-bottom: 18px; }
-
-  .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .price-card {
-    background: #f6f5f2; border-radius: 12px; padding: 14px 16px;
-  }
-  .price-card .name { font-size: 13px; color: #777; }
-  .price-card .value { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-top: 2px; }
-  .price-card .unit { font-size: 12px; font-weight: 400; color: #999; }
-  .price-note { font-size: 11px; color: #aaa; margin-top: 12px; }
-  .up { color: #c0392b; } .down { color: #2471a3; }
-
-  .service-video { border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
-  .service-video video { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-
-  .item-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-  .item-chips span {
-    background: #f6f5f2; border-radius: 20px; padding: 8px 16px;
-    font-size: 13px; font-weight: 600; color: #555;
-  }
-  .service-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f0efec; }
-  .service-item:last-child { border-bottom: none; }
-  .service-item .num {
-    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
-    background: #2c2c2a; color: #fff; font-size: 14px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .service-item h3 { font-size: 15px; font-weight: 700; }
-  .service-item p { font-size: 13px; color: #777; }
-
-  .contact { background: #2c2c2a; color: #fff; text-align: center; }
-  .contact .sec-title { color: #fff; }
-  .contact .sec-sub { color: #999; }
-  .contact-btns { display: flex; gap: 10px; justify-content: center; }
-  .contact-btns a {
-    flex: 1; max-width: 180px; padding: 13px 0; border-radius: 10px;
-    font-size: 14px; font-weight: 700; text-decoration: none;
-  }
-  .btn-call { background: #fff; color: #2c2c2a; }
-  .btn-kakao { background: #fee500; color: #2c2c2a; }
-
-  footer { padding: 22px; text-align: center; font-size: 11px; color: #aaa; background: #f6f5f2; }
-</style>
+<title>보물모아 — 인천·부천 고철·비철·폐지 매입 | 방문수거</title>
+<meta name="description" content="인천 고물상 보물모아. 부천 고철 매입, 구리·알루미늄 비철, 폐지까지 오늘 단가로 매입합니다. 소량 환영, 방문수거, 공장 정기수거, 현장 계근 즉시 정산. 인천·부천·김포 3개 거점.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="보물모아 — 인천·부천 고철·비철·폐지 매입 | 방문수거">
+<meta property="og:description" content="고철·비철·폐지, 제값 받고 파세요. 3개 거점 · 방문수거 · 현장 계근 즉시 정산. 전화 한 통이면 됩니다.">
+<meta property="og:image" content="assets/hero-poster.jpg">
+<meta property="og:site_name" content="보물모아">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23c4703a'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-weight='bold'%3E%EB%B3%B4%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script src="data.js"></script>
+<script src="prices.js"></script>
+<script src="posts.js"></script>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <span class="logo">보물모아</span>
-    <nav>
-      <a href="#price">시세</a>
-      <a href="#service">서비스</a>
-      <a href="#contact">문의</a>
-    </nav>
-  </header>
+<header class="site-header">
+  <div class="container">
+    <a class="logo" href="#top">보물<em>모아</em></a>
+    <button class="header-call js-call" type="button">📞 전화</button>
+  </div>
+</header>
 
-  <div class="hero">
-    <video autoplay muted loop playsinline poster="assets/hero-poster.jpg">
-      <source src="assets/hero.mp4" type="video/mp4">
-    </video>
-    <div class="overlay">
-      <h1>고철, 제값 받고 파는<br>가장 쉬운 방법</h1>
-      <p>동네 고물상 네트워크와 오늘의 시세를 한 곳에서</p>
-      <a class="cta" href="#price">오늘 시세 확인하기</a>
+<!-- ① 히어로 -->
+<div class="hero" id="top">
+  <video autoplay muted loop playsinline poster="assets/hero-poster.jpg" aria-hidden="true">
+    <source src="assets/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay">
+    <div class="container hero-inner">
+      <h1 id="hero-tagline">고철·비철·폐지,<br>제값 받고 파세요</h1>
+      <p class="hero-sub">3개 거점 · 방문수거 · 현장 계근 정산</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary js-call" type="button">📞 지금 전화하기</button>
+        <a class="btn btn-ghost" href="#prices">오늘 단가 보기</a>
+      </div>
     </div>
   </div>
-
-  <section id="price">
-    <h2 class="sec-title">오늘의 매입 시세</h2>
-    <p class="sec-sub">품목별 kg당 매입가</p>
-    <div class="price-grid">
-      <div class="price-card"><div class="name">고철</div><div class="value">385 <span class="unit">원/kg</span> <span class="up">▲</span></div></div>
-      <div class="price-card"><div class="name">구리 (동)</div><div class="value">9,200 <span class="unit">원/kg</span></div></div>
-      <div class="price-card"><div class="name">알루미늄 캔</div><div class="value">1,850 <span class="unit">원/kg</span></div></div>
-      <div class="price-card"><div class="name">폐지 (신문)</div><div class="value">90 <span class="unit">원/kg</span> <span class="down">▼</span></div></div>
-    </div>
-    <p class="price-note">* 시세는 시장 상황에 따라 매일 변동됩니다. 방문 전 전화로 확인하세요.</p>
-  </section>
-
-  <section id="items">
-    <h2 class="sec-title">이런 것들, 다 삽니다</h2>
-    <p class="sec-sub">소량이든 대량이든 무게대로 정직하게</p>
-    <div class="service-video">
-      <video autoplay muted loop playsinline poster="assets/yard-poster.jpg">
-        <source src="assets/yard.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="item-chips">
-      <span>고철 · 잡철</span>
-      <span>구리 · 비철금속</span>
-      <span>폐지 · 박스</span>
-      <span>알루미늄 캔</span>
-      <span>스테인리스</span>
-      <span>폐가전 · 모터</span>
-    </div>
-  </section>
-
-  <section id="service" style="background:#f6f5f2;">
-    <h2 class="sec-title">이렇게 진행됩니다</h2>
-    <p class="sec-sub">가져오시면 바로 계량, 바로 정산</p>
-    <div class="service-video">
-      <video autoplay muted loop playsinline poster="assets/weighing-poster.jpg">
-        <source src="assets/weighing.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="service-item">
-      <div class="num">1</div>
-      <div><h3>가져오기 또는 출장 수거</h3><p>소량은 직접 방문, 대량·무거운 고철은 전화 주시면 트럭으로 수거합니다.</p></div>
-    </div>
-    <div class="service-item">
-      <div class="num">2</div>
-      <div><h3>계량기에서 바로 무게 확인</h3><p>트럭째 계근대에 올라가면 키로수가 바로 표시됩니다. 눈앞에서 투명하게.</p></div>
-    </div>
-    <div class="service-item">
-      <div class="num">3</div>
-      <div><h3>오늘 시세로 현장 정산</h3><p>당일 시세 기준으로 그 자리에서 바로 정산해 드립니다.</p></div>
-    </div>
-  </section>
-
-  <section id="contact" class="contact">
-    <h2 class="sec-title">지금 바로 문의하세요</h2>
-    <p class="sec-sub">대량 매입 · 출장 수거 · 시세 문의</p>
-    <div class="contact-btns">
-      <a class="btn-call" href="tel:010-0000-0000">전화 연결</a>
-      <a class="btn-kakao" href="#">카카오톡 문의</a>
-    </div>
-  </section>
-
-  <footer>보물모아 · 고철·비철·폐지 매입 전문</footer>
-
 </div>
+
+<!-- ② 오늘의 매입 단가 -->
+<section id="prices">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">오늘의 매입 단가</h2>
+      <div class="price-meta">
+        <span class="badge hidden" id="price-updated"></span>
+        <span class="sec-sub">시세에 따라 변동 · 대량은 전화 협의</span>
+      </div>
+    </div>
+    <input class="price-filter" id="price-filter" type="search"
+           placeholder="품목 검색 (예: 구리, 샷시, 폐지)" autocomplete="off">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th class="col-item">품목</th>
+          <th class="col-price" id="price-unit-head">매입가</th>
+          <th class="col-note">비고</th>
+        </tr>
+      </thead>
+      <tbody id="price-body"></tbody>
+    </table>
+    <p class="price-note">※ 표에 없는 품목도 매입합니다. 사진과 함께 문의 주시면 바로 확인해 드립니다.</p>
+  </div>
+</section>
+
+<!-- ②-b 소식·시세 브리핑 (posts.js 매니페스트가 비어 있으면 통째로 숨김) -->
+<section id="posts" class="hidden">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">📰 소식·시세 브리핑</h2>
+      <p class="sec-sub">고철·비철 시세와 지원사업 소식을 정리해 올립니다</p>
+    </div>
+    <div class="post-list" id="post-list"></div>
+    <a class="post-more" href="posts/index.html">전체 보기 →</a>
+  </div>
+</section>
+
+<!-- ③ 이렇게 진행돼요 -->
+<section id="process">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">이렇게 진행돼요</h2>
+      <p class="sec-sub">전화 한 통이면 끝, 복잡한 절차 없습니다</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div><h3>전화·카톡으로 알려주세요</h3><p>품목과 대략적인 양만 알려주시면 됩니다. 사진 한 장이면 더 정확해요.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><h3>방문수거 또는 직접 방문</h3><p>양이 있으면 트럭으로 수거하러 갑니다. 소량은 가까운 거점으로 가져오세요.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><h3>현장 계근 → 즉시 정산</h3><p>계근대 무게를 눈앞에서 확인하고, 그 자리에서 바로 정산해 드립니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 이런 분들 오세요 -->
+<section id="audience">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">이런 분들 오세요</h2>
+      <p class="sec-sub">소량 한 자루부터 공장 정기수거까지</p>
+    </div>
+    <div class="audience-grid">
+      <div class="aud-card">
+        <div class="aud-icon">🏠</div>
+        <h3>개인 · 소상공인</h3>
+        <ul>
+          <li>소량도 환영 — 한 자루도 무게대로</li>
+          <li>즉시 현금 정산</li>
+          <li>이사·정리하다 나온 고철·폐가전도 OK</li>
+        </ul>
+      </div>
+      <div class="aud-card">
+        <div class="aud-icon">🚛</div>
+        <h3>청소 · 철거 · 설비 업체</h3>
+        <ul>
+          <li>현장 일괄 수거 — 트럭 보내드립니다</li>
+          <li><strong>정기 수거 계약</strong> 가능</li>
+          <li>세금계산서 발행</li>
+        </ul>
+      </div>
+      <div class="aud-card">
+        <div class="aud-icon">🏭</div>
+        <h3>공장 · 상가</h3>
+        <ul>
+          <li>매월 정기 방문 수거</li>
+          <li>물량에 따라 단가 우대</li>
+          <li>공정 스크랩·자투리 자재 정리</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 거점 안내 -->
+<section id="locations">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">거점 안내</h2>
+      <p class="sec-sub" id="service-area"></p>
+    </div>
+    <div class="loc-grid" id="loc-grid"></div>
+  </div>
+</section>
+
+<!-- ⑥ 자주 묻는 질문 -->
+<section id="faq">
+  <div class="container">
+    <div class="sec-head">
+      <h2 class="sec-title">자주 묻는 질문</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>최소 수량이 있나요?</summary>
+        <p>없습니다. 한 자루, 한 박스도 계근해서 무게대로 정산해 드립니다. 다만 방문수거는 기름값이 나오는 양(대략 트럭 반 대 이상)일 때 가능하니, 애매하면 전화로 먼저 물어봐 주세요.</p>
+      </details>
+      <details>
+        <summary>수거비를 받나요?</summary>
+        <p>일반적인 고철·비철 방문수거는 수거비를 받지 않습니다. 다만 해체 작업이 필요하거나 매입가보다 처리비가 큰 품목(일부 폐가구·혼합 폐기물 등)은 사전에 협의드립니다. 견적은 무료입니다.</p>
+      </details>
+      <details>
+        <summary>단가는 어떻게 정해지나요?</summary>
+        <p>당일 시장 시세를 기준으로 품목별 단가를 정하고, 계근대에서 잰 무게 × 단가로 계산합니다. 무게 확인부터 정산까지 전부 눈앞에서 진행되고, 대량 물량은 단가를 따로 협의해 드립니다.</p>
+      </details>
+      <details>
+        <summary>세금계산서 발행되나요?</summary>
+        <p>네, 사업자 거래는 세금계산서를 발행해 드립니다. 청소·철거·설비 업체, 공장의 정기 거래도 월 단위 정산과 증빙이 가능합니다.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ 파트너 고물상 (한 줄) -->
+<section id="partner">
+  <div class="container">
+    <div class="partner-box">
+      <strong>동네 고물상 사장님께</strong> — 저희가 쓰는 시세표·거래장부 도구를 무료로 열어드립니다.
+      관심 있으시면 <a href="#" class="js-call-link">전화 주세요</a>.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div><strong id="footer-name">보물모아</strong> · 고철·비철·폐지 매입</div>
+    <!-- ★ 아래 상호·대표자·사업자등록번호에 실제 정보를 입력하세요 -->
+    <div>상호: (★입력) · 대표: (★입력) · 사업자등록번호: (★입력)</div>
+    <div id="footer-area"></div>
+    <div>© 보물모아</div>
+  </div>
+</footer>
+
+<!-- 모바일 하단 전화바 -->
+<div class="action-bar">
+  <button class="bar-call js-call" type="button">📞 전화하기</button>
+  <a class="bar-kakao hidden" id="bar-kakao" href="#" target="_blank" rel="noopener">💬 카톡 문의</a>
+</div>
+
+<!-- 전화 지점 선택 시트 -->
+<div class="call-sheet-backdrop" id="call-backdrop"></div>
+<div class="call-sheet" id="call-sheet" role="dialog" aria-modal="true" aria-label="전화할 지점 선택">
+  <h3>어느 지점으로 연결할까요?</h3>
+  <div id="call-sheet-list"></div>
+  <button class="sheet-close" id="call-sheet-close" type="button">닫기</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var D = window.BOMULMOA || {};
+  var P = window.BOMULMOA_PRICES || {};
+  var locations = (D.locations || []).filter(function (l) { return l && l.name; });
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function telHref(phone) { return "tel:" + String(phone || "").replace(/[^0-9+]/g, ""); }
+
+  /* ── 텍스트 바인딩 ── */
+  var tagEl = document.getElementById("hero-tagline");
+  if (D.tagline) tagEl.innerHTML = esc(D.tagline).replace(", ", ",<br>");
+  document.getElementById("service-area").textContent = D.serviceArea || "";
+  document.getElementById("footer-area").textContent = D.serviceArea ? "서비스 지역: " + D.serviceArea : "";
+  if (D.businessName) document.getElementById("footer-name").textContent = D.businessName;
+
+  /* ── 카카오 버튼 ── */
+  if (D.kakaoChannelUrl) {
+    var kakao = document.getElementById("bar-kakao");
+    kakao.href = D.kakaoChannelUrl;
+    kakao.classList.remove("hidden");
+  }
+
+  /* ── 전화: 지점 1곳이면 바로, 여러 곳이면 선택 시트 ── */
+  var sheet = document.getElementById("call-sheet");
+  var backdrop = document.getElementById("call-backdrop");
+  var sheetList = document.getElementById("call-sheet-list");
+  var callable = locations.filter(function (l) { return l.phone; });
+
+  sheetList.innerHTML = callable.map(function (l) {
+    return '<a class="sheet-item" href="' + telHref(l.phone) + '">' +
+      '<span class="n">' + esc(l.name) + "</span>" +
+      '<span class="p">' + esc(l.phone) + "</span></a>";
+  }).join("");
+
+  function openSheet() { sheet.classList.add("open"); backdrop.classList.add("open"); }
+  function closeSheet() { sheet.classList.remove("open"); backdrop.classList.remove("open"); }
+  function handleCall(e) {
+    if (callable.length === 1) { location.href = telHref(callable[0].phone); return; }
+    if (e) e.preventDefault();
+    openSheet();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".js-call, .js-call-link"), function (el) {
+    el.addEventListener("click", handleCall);
+  });
+  backdrop.addEventListener("click", closeSheet);
+  document.getElementById("call-sheet-close").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSheet(); });
+
+  /* ── 단가표 렌더링 ── */
+  var unitHead = document.getElementById("price-unit-head");
+  unitHead.textContent = "매입가" + (P.unit ? " (" + P.unit + ")" : "");
+  if (P.updatedAt) {
+    var upd = document.getElementById("price-updated");
+    upd.textContent = P.updatedAt + " 기준";
+    upd.classList.remove("hidden");
+  }
+
+  var tbody = document.getElementById("price-body");
+  var items = P.items || [];
+  function priceCell(p) {
+    if (typeof p === "number" && isFinite(p)) {
+      return p.toLocaleString("ko-KR") + ' <span class="won">원</span>';
+    }
+    return '<span class="ask-price">전화 문의</span>';
+  }
+  function renderPrices(query) {
+    var q = (query || "").trim().toLowerCase();
+    var html = "";
+    var shown = 0;
+    var byCat = [];
+    items.forEach(function (it) {
+      var cat = it.category || "기타";
+      var last = byCat[byCat.length - 1];
+      if (!last || last.cat !== cat) { last = { cat: cat, rows: [] }; byCat.push(last); }
+      last.rows.push(it);
+    });
+    byCat.forEach(function (g) {
+      var rows = g.rows.filter(function (it) {
+        if (!q) return true;
+        return (it.item + " " + g.cat + " " + (it.note || "")).toLowerCase().indexOf(q) !== -1;
+      });
+      if (!rows.length) return;
+      html += '<tr class="cat-row"><th colspan="3">' + esc(g.cat) + "</th></tr>";
+      rows.forEach(function (it) {
+        shown++;
+        html += "<tr>" +
+          '<td class="col-item">' + esc(it.item) + "</td>" +
+          '<td class="col-price">' + priceCell(it.price) + "</td>" +
+          '<td class="col-note">' + esc(it.note || "") + "</td></tr>";
+      });
+    });
+    if (!shown) html = '<tr><td class="price-empty" colspan="3">검색 결과가 없습니다 — 전화로 문의해 주세요</td></tr>';
+    tbody.innerHTML = html;
+  }
+  renderPrices("");
+  document.getElementById("price-filter").addEventListener("input", function () {
+    renderPrices(this.value);
+  });
+
+  /* ── 소식·시세 브리핑 (매니페스트 없거나 비면 섹션 숨김 유지) ── */
+  var postsWrap = window.BOMULMOA_POSTS || {};
+  var posts = postsWrap.posts || [];
+  var postTypeLabel = { sise: "시세 브리핑", grants: "지원사업" };
+  if (posts.length) {
+    document.getElementById("post-list").innerHTML = posts.slice(0, 5).map(function (p) {
+      return '<a class="post-item" href="posts/' + esc(p.slug) + '.html">' +
+        '<span class="post-item-meta">' + esc(p.date) + " · " + esc(postTypeLabel[p.type] || p.type || "") + "</span>" +
+        '<span class="post-item-title">' + esc(p.title) + "</span>" +
+        (p.summary ? '<span class="post-item-summary">' + esc(p.summary) + "</span>" : "") +
+        "</a>";
+    }).join("");
+    document.getElementById("posts").classList.remove("hidden");
+  }
+
+  /* ── 거점 카드 ── */
+  document.getElementById("loc-grid").innerHTML = locations.map(function (l) {
+    var mapBtn = l.naverPlaceUrl
+      ? '<a class="loc-map" href="' + esc(l.naverPlaceUrl) + '" target="_blank" rel="noopener">네이버 지도</a>'
+      : "";
+    return '<div class="loc-card">' +
+      "<h3>" + esc(l.name) + "</h3>" +
+      '<div class="loc-addr">' + esc(l.address || "") + "</div>" +
+      '<div class="loc-hours">' + esc(l.hours || "") + "</div>" +
+      '<div class="loc-actions">' +
+      '<a class="loc-call" href="' + telHref(l.phone) + '">📞 ' + esc(l.phone || "전화") + "</a>" +
+      mapBtn + "</div></div>";
+  }).join("");
+
+  /* ── JSON-LD LocalBusiness (지점별, 미입력 placeholder 번호 "0000" 제외) ── */
+  var ld = locations
+    .filter(function (l) { return l.phone && l.phone.indexOf("0000") === -1; })
+    .map(function (l) {
+      var node = {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        name: l.name,
+        telephone: l.phone,
+        address: { "@type": "PostalAddress", streetAddress: l.address || "", addressCountry: "KR" },
+        areaServed: D.serviceArea || "",
+        openingHours: l.hours || "",
+        parentOrganization: { "@type": "Organization", name: D.businessName || "보물모아" }
+      };
+      if (l.naverPlaceUrl) node.url = l.naverPlaceUrl;
+      if (typeof l.lat === "number" && typeof l.lng === "number") {
+        node.geo = { "@type": "GeoCoordinates", latitude: l.lat, longitude: l.lng };
+      }
+      return node;
+    });
+  if (ld.length) {
+    var s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.textContent = JSON.stringify(ld.length === 1 ? ld[0] : ld);
+    document.head.appendChild(s);
+  }
+})();
+</script>
 </body>
 </html>

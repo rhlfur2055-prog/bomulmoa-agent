@@ -49,3 +49,36 @@ export async function saveGrants(grants: Grant[]): Promise<number> {
   }
   return added;
 }
+
+/** 시트에서 읽어온 지원사업 한 행 */
+export interface GrantRow {
+  collectedAt: string;
+  title: string;
+  org: string;
+  field: string;
+  target: string;
+  startDate: string;
+  endDate: string;
+  region: string;
+  source: string;
+  link: string;
+}
+
+/** 지원사업 탭 전체를 읽어 구조화한다 (헤더 제외). 제목이 있는 행만 반환. */
+export async function getGrants(): Promise<GrantRow[]> {
+  const rows = await readRange(`${TAB_GRANTS}!A2:J`);
+  return rows
+    .filter((r) => r[1])
+    .map((r) => ({
+      collectedAt: r[0] ?? "",
+      title: r[1] ?? "",
+      org: r[2] ?? "",
+      field: r[3] ?? "",
+      target: r[4] ?? "",
+      startDate: r[5] ?? "",
+      endDate: r[6] ?? "",
+      region: r[7] ?? "",
+      source: r[8] ?? "",
+      link: r[9] ?? "",
+    }));
+}
