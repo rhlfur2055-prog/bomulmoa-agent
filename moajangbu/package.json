@@ -1,0 +1,11 @@
+{
+  "name": "moajangbu",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify:sql": "node test/verify-sql.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.4"
+  }
+}
